@@ -163,6 +163,23 @@ end)
 
 -- Events
 
+
+-- Added code by Paolo to remove invalid vehicles
+QBCore.Functions.CreateCallback('qb-garages:server:RemoveInvalidVehicles', function(source, cb)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+    local citizenId = Player.PlayerData.citizenid
+
+    MySQL.update('DELETE FROM player_vehicles WHERE state = 0 AND citizenid = ?', { citizenId }, function(affectedRows)
+        if affectedRows > 0 then
+            TriggerClientEvent('QBCore:Notify', src, 'Vehicles with state 0 have been removed from your garage.', 'success')
+        end
+        cb(true)
+    end)
+end)
+
+
 RegisterNetEvent('qb-garages:server:updateVehicleStats', function(plate, fuel, engine, body)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
